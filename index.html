@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IDX Pro Unified HYBRID — Smart Scanner + Price Action</title>
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--text:#f8fafc;--muted:#94a3b8;--accent:#38bdf8;--green:#22c55e;--red:#ef4444;--yellow:#eab308;--border:#334155}
+*{box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);margin:0;padding:15px;line-height:1.5;font-size:13px}
+.container{max-width:1600px;margin:0 auto}
+h1{font-size:22px;margin:0 0 5px}
+h2{font-size:17px;margin:0 0 12px;color:var(--accent)}
+h3{font-size:14px;margin:10px 0 8px;color:var(--muted);text-transform:uppercase}
+.subtitle{color:var(--muted);font-size:13px;margin-bottom:15px}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:15px;border-bottom:2px solid var(--border);padding-bottom:8px}
+.tab-btn{padding:6px 12px;background:var(--card);border:1px solid var(--border);color:var(--muted);cursor:pointer;border-radius:5px;font-size:12px}
+.tab-btn.active{background:var(--accent);color:#000;font-weight:bold;border-color:var(--accent)}
+.tab-content{display:none}.tab-content.active{display:block}
+.card{background:var(--card);padding:15px;border-radius:6px;margin-bottom:15px;border:1px solid var(--border)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:15px}
+.stat-box{background:#0f172a;padding:10px;border-radius:5px;border:1px solid var(--border)}
+.stat-label{font-size:10px;color:var(--muted);text-transform:uppercase}
+.stat-value{font-size:16px;font-weight:bold;margin-top:3px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{padding:6px 8px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+th{background:#0f172a;color:var(--muted);font-weight:600;position:sticky;top:0;font-size:11px}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+.pos{color:var(--green)}.neg{color:var(--red)}.warn{color:var(--yellow)}
+button{padding:6px 12px;background:var(--accent);color:#000;border:none;border-radius:4px;cursor:pointer;font-weight:bold;margin-right:4px;font-size:12px}
+button:hover{opacity:.9}
+button.danger{background:var(--red);color:#fff}
+button.secondary{background:var(--border);color:var(--text)}
+button.sm{padding:3px 8px;font-size:11px}
+input,select{padding:6px;background:#0f172a;border:1px solid var(--border);color:var(--text);border-radius:4px;font-size:12px}
+.form-group{margin-bottom:10px}
+.form-group label{display:block;margin-bottom:3px;color:var(--muted);font-size:11px}
+.badge{padding:2px 7px;border-radius:10px;font-size:10px;font-weight:bold;display:inline-block}
+.badge-buy{background:rgba(34,197,94,.2);color:var(--green)}
+.badge-sell{background:rgba(239,68,68,.2);color:var(--red)}
+.badge-hold{background:rgba(148,163,184,.2);color:var(--muted)}
+.badge-warn{background:rgba(234,179,8,.2);color:var(--yellow)}
+.loader{display:inline-block;width:14px;height:14px;border:2px solid var(--muted);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.scroll-table{overflow-x:auto;max-height:600px;overflow-y:auto}
+.rule-box{background:#0f172a;padding:10px;border-left:3px solid var(--accent);margin-bottom:8px;border-radius:3px}
+.rule-box b{color:var(--accent)}
+.add-bar{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:15px}
+.add-bar input{width:140px}
+.add-bar select{width:160px}
+.tag{display:inline-block;background:var(--accent);color:#000;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:bold;margin:2px}
+.tag .x{cursor:pointer;margin-left:4px;font-weight:bold}
+.tag .x:hover{color:var(--red)}
+.sector-filter{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+.sector-btn{padding:4px 10px;background:#0f172a;border:1px solid var(--border);color:var(--muted);cursor:pointer;border-radius:12px;font-size:11px}
+.sector-btn.active{background:var(--accent);color:#000;font-weight:bold}
+.info-banner{background:linear-gradient(135deg,#1e3a8a,#0f172a);padding:12px;border-radius:6px;margin-bottom:15px;border:1px solid var(--accent)}
+.info-banner b{color:var(--accent)}
+</style>
+
+<style id="smartScannerCSS">
+#smartScanner .ss-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+#smartScanner .ss-toolbar select,#smartScanner .ss-toolbar input{min-width:150px}
+.ss-note{font-size:11px;color:var(--muted);margin:6px 0 14px}
+.ss-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:14px}
+.ss-card{background:#0f172a;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.ss-head{display:flex;justify-content:space-between;gap:10px;padding:12px;border-bottom:1px solid var(--border)}
+.ss-ticker{font-size:17px;font-weight:800}.ss-meta{font-size:11px;color:var(--muted)}
+.ss-stage{padding:5px 9px;border-radius:999px;font-size:10px;font-weight:800;white-space:nowrap}
+.ss-watch{background:#334155;color:#cbd5e1}.ss-pull{background:#713f12;color:#fde68a}.ss-break{background:#075985;color:#bae6fd}.ss-open{background:#14532d;color:#bbf7d0}.ss-tp{background:#854d0e;color:#fef08a}.ss-exit{background:#7f1d1d;color:#fecaca}.ss-monitor{background:#1e293b;color:#94a3b8}
+.ss-chart{height:250px;background:#020617;border-bottom:1px solid var(--border)}
+.ss-chart svg{width:100%;height:100%;display:block}
+.ss-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:10px}
+.ss-stat{background:#111827;border-radius:6px;padding:7px}.ss-stat b{display:block;font-size:12px}.ss-stat span{font-size:9px;color:var(--muted);text-transform:uppercase}
+.ss-score{padding:10px;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.ss-scorebar{height:8px;background:#1e293b;border-radius:8px;overflow:hidden;margin:6px 0}.ss-scorebar i{display:block;height:100%;background:linear-gradient(90deg,#64748b,#38bdf8,#22c55e)}
+.ss-conds{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:10px}.ss-cond{font-size:10px;padding:6px;border-radius:6px;background:#111827;color:#94a3b8}.ss-cond.ok{color:#bbf7d0;background:rgba(34,197,94,.09)}
+.ss-footer{display:flex;justify-content:space-between;gap:8px;padding:10px;font-size:10px;color:var(--muted)}
+.ss-table{overflow:auto}.ss-table table{min-width:1100px}.ss-table tr.ss-row{cursor:pointer}.ss-table tr.ss-row:hover{background:#111827}
+.ss-rank{font-size:15px;font-weight:800}.ss-reason{color:#cbd5e1;font-size:10px;max-width:260px;white-space:normal}
+.ss-legend{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.ss-pill{padding:4px 7px;border-radius:999px;background:#111827;color:#94a3b8;font-size:10px}
+@media(max-width:700px){.ss-grid{grid-template-columns:1fr}.ss-stats{grid-template-columns:1fr 1fr}.ss-chart{height:220px}}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>📈 IDX Pro Unified <span style="font-size:12px;color:var(--muted)">· 10 Modul · 36 Saham MSCI & Syariah</span></h1>
+<div class="subtitle">STRATEGI HYBRID: Smart Scanner + ATR + Valuasi + Price Action + Weakness Protocol — No Auto Trading</div>
+
+<div class="info-banner">
+<b>📊 Default 36 Saham:</b> Blue chip MSCI Indonesia yang juga tercatat di Daftar Efek Syariah (DES) — mencakup 12 sektor: Perbankan, Konsumer, Telekomunikasi, Pertambangan, Infrastruktur, Properti, Semen, Kesehatan, Peternakan, Teknologi, Energi, dan Kimia.
+</div>
+
+<div class="tabs">
+<button class="tab-btn active" onclick="switchTab(event,'dashboard')">Dashboard</button><button class="tab-btn" onclick="switchTab(event,'smartScanner')">🧠 Smart Scanner + Chart</button>
+<button class="tab-btn" onclick="switchTab(event,'mm')">MM Engine & Sinyal</button>
+<button class="tab-btn" onclick="switchTab(event,'exit')">Exit Plan & Trailing</button>
+<button class="tab-btn" onclick="switchTab(event,'reentry')">Re-Entry Mingguan</button>
+<button class="tab-btn" onclick="switchTab(event,'yahoo')">Yahoo Screener 18-Kolom</button>
+<button class="tab-btn" onclick="switchTab(event,'sharia')">Sharia Screener + AI</button>
+<button class="tab-btn" onclick="switchTab(event,'rotasi')">Rotasi & Re-Entry</button>
+<button class="tab-btn" onclick="switchTab(event,'alokasi')">Alokasi & Watchlist</button>
+<button class="tab-btn" onclick="switchTab(event,'simulasi')">Simulasi Realokasi</button>
+<button class="tab-btn" onclick="switchTab(event,'telegram')">Notifikasi Telegram</button>
+</div>
+
+<!-- TAB 1: DASHBOARD -->
+<div id="dashboard" class="tab-content active">
+<div class="card">
+<h2>Market Intelligence</h2>
+<div class="grid">
+<div class="stat-box"><div class="stat-label">Last Sync</div><div class="stat-value" id="lastSync">-</div></div>
+<div class="stat-box"><div class="stat-label">Nilai Portofolio</div><div class="stat-value" id="totalPortfolio">-</div></div>
+<div class="stat-box"><div class="stat-label">Perubahan Hari Ini</div><div class="stat-value" id="dailyChange">-</div></div>
+<div class="stat-box"><div class="stat-label">Unrealized P/L</div><div class="stat-value" id="totalPL">-</div></div>
+<div class="stat-box"><div class="stat-label">Sinyal Aksi</div><div class="stat-value" id="actionSignal">-</div></div>
+<div class="stat-box"><div class="stat-label">Nilai di Bawah Stop</div><div class="stat-value neg" id="belowStop">-</div></div>
+</div>
+<button onclick="syncAllData()">🔄 Sync Harga Yahoo</button>
+<button class="secondary" onclick="toggleAutoSync()">⏱️ <span id="autoSyncLabel">Auto 60s</span></button>
+<button class="danger" onclick="resetData()">Reset Data</button>
+</div>
+
+<div class="card">
+<h2>📋 Kelola Watchlist (36 Saham MSCI & Syariah)</h2>
+<p style="color:var(--muted);font-size:12px;margin-bottom:10px">Ketik kode saham, pilih sektor, klik Tambah. Data tersimpan di browser.</p>
+<div class="add-bar">
+<div class="form-group" style="margin:0"><label>Kode Saham</label><input type="text" id="inputTicker" placeholder="cth: GOTO" onkeydown="if(event.key==='Enter')addStock()"></div>
+<div class="form-group" style="margin:0"><label>Sektor</label>
+<select id="inputSector">
+<option value="Perbankan">Perbankan</option>
+<option value="Konsumer">Konsumer</option>
+<option value="Telekomunikasi">Telekomunikasi</option>
+<option value="Batubara">Batubara</option>
+<option value="Pertambangan">Pertambangan</option>
+<option value="Alat Berat">Alat Berat</option>
+<option value="Semen">Semen</option>
+<option value="Infrastruktur">Infrastruktur</option>
+<option value="Properti">Properti</option>
+<option value="Kesehatan">Kesehatan</option>
+<option value="Peternakan">Peternakan</option>
+<option value="Teknologi">Teknologi</option>
+<option value="Energi">Energi</option>
+<option value="Kimia">Kimia</option>
+<option value="Lainnya">Lainnya</option>
+</select>
+</div>
+<button onclick="addStock()">+ Tambah</button>
+<button class="secondary" onclick="loadDefaultWatchlist()">Muat 36 Default</button>
+<button class="danger" onclick="clearWatchlist()">Kosongkan</button>
+</div>
+<div id="watchlistTags" style="margin-bottom:10px;max-height:120px;overflow-y:auto"></div>
+<p style="color:var(--muted);font-size:11px;margin:0">Total: <b id="totalStocks">0</b> saham</p>
+</div>
+
+<div class="card">
+<h3>Filter Sektor</h3>
+<div class="sector-filter" id="sectorFilter"></div>
+</div>
+
+<div class="card">
+<h3>Watchlist Pasar — Harga Live</h3>
+<div class="scroll-table">
+<table id="watchlistTable">
+<thead><tr><th>Ticker</th><th>Sektor</th><th>Harga</th><th>Δ Hari</th><th>ROE</th><th>PER</th><th>PBV</th><th>Vol</th><th>ATR</th><th>RSI</th><th>Status</th><th>Aksi</th></tr></thead>
+<tbody></tbody>
+</table>
+</div>
+</div>
+
+<div class="card">
+<h3>Risk Mitigation Rules</h3>
+<div class="rule-box"><b>Maks. 35% per Sektor</b> — Batubara & energi mudah berbalik arah bersamaan — cegah konsentrasi berlebih.</div>
+<div class="rule-box"><b>Cash Buffer 15%</b> — Hasil profit-taking diparkir untuk menunggu sinyal re-entry valid via ATR pullback.</div>
+</div>
+</div>
+
+
+<!-- TAB SMART SCANNER HYBRID -->
+<div id="smartScanner" class="tab-content">
+  <div class="card">
+    <h2>🧠 Smart Scanner Hybrid — Setup Flow + Visual Price Action</h2>
+    <div class="ss-toolbar">
+      <select id="ssStageFilter" onchange="renderSmartScanner()">
+        <option value="ALL">Semua Tahap</option><option value="WATCH">WATCH</option><option value="PULLBACK">PULLBACK</option><option value="BREAKOUT">BREAKOUT</option><option value="OPEN">OPEN</option><option value="TAKE PROFIT">TAKE PROFIT</option><option value="EXIT">EXIT</option><option value="MONITOR">MONITOR</option>
+      </select>
+      <select id="ssSort" onchange="renderSmartScanner()"><option value="score">Kekuatan kondisi</option><option value="stage">Tahap proses</option><option value="change">Perubahan %</option><option value="ticker">Ticker</option></select>
+      <button onclick="syncAllData()">🔄 Scan & Sync</button>
+    </div>
+    <div class="ss-note">Mode analisis saja: <b>OPEN</b> berarti setup memenuhi kondisi scanner, bukan perintah transaksi. Ranking hanya menunjukkan jumlah kondisi yang terpenuhi. Mesin menggabungkan engine teknikal IDX Pro dengan checklist Weakness Rectangle: liquidity sweep/rejection, level S/R, dan trigger candle.</div>
+    <div class="ss-legend"><span class="ss-pill">WATCH → dekat Support</span><span class="ss-pill">PULLBACK → retest/support</span><span class="ss-pill">BREAKOUT → tembus Resistance + volume</span><span class="ss-pill">OPEN → konfirmasi multi-kondisi</span><span class="ss-pill">TP → target/extended</span><span class="ss-pill">EXIT → support rusak</span></div>
+  </div>
+  <div class="card ss-table">
+    <h3>Ranking Smart Scanner</h3>
+    <table><thead><tr><th>#</th><th>Saham</th><th>Tahap</th><th>Kondisi</th><th>Harga</th><th>Support</th><th>Resistance</th><th>MA20</th><th>MA50</th><th>RSI</th><th>Vol×</th><th>Alasan</th></tr></thead><tbody id="ssRankBody"></tbody></table>
+  </div>
+  <div id="ssCards" class="ss-grid"></div>
+</div>
+
+<!-- TAB 2: MM ENGINE -->
+<div id="mm" class="tab-content">
+<div class="card">
+<h2>Money Management & Sinyal Engine</h2>
+<div class="grid">
+<div class="form-group"><label>Modal (Rp)</label><input type="number" id="mmModal" value="100000000" oninput="renderMM()"></div>
+<div class="form-group"><label>Risk/Trade %</label><input type="number" id="mmRisk" value="2" step="0.1" oninput="renderMM()"></div>
+<div class="form-group"><label>SL/TS × ATR</label><input type="number" id="mmSLMult" value="2" step="0.1" oninput="renderMM()"></div>
+<div class="form-group"><label>Pullback × ATR</label><input type="number" id="mmPullback" value="1.5" step="0.1" oninput="renderMM()"></div>
+<div class="form-group"><label>Target R:R</label><input type="number" id="mmRR" value="3" step="0.5" oninput="renderMM()"></div>
+</div>
+<div class="scroll-table">
+<table id="mmTable">
+<thead><tr><th>Kode</th><th>Status</th><th>Entry</th><th>Harga Kini</th><th>Δ Hari</th><th>P/L %</th><th>ATR</th><th>PER/PBV</th><th>Sinyal</th><th>SL</th><th>Trailing</th><th>TP1/TP2</th><th>Lot</th><th>Dana</th><th>Risiko Rp</th><th>Alasan</th><th>Aksi</th></tr></thead>
+<tbody></tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- TAB 3: EXIT PLAN -->
+<div id="exit" class="tab-content">
+<div class="card">
+<h2>Exit Plan Mingguan — Portofolio Aktif</h2>
+<p style="color:var(--muted);font-size:12px;margin-bottom:10px">Tambah posisi terbuka di bawah. Trailing stop naik otomatis mengikuti Peak High.</p>
+<div class="add-bar">
+<div class="form-group" style="margin:0"><label>Kode</label><input type="text" id="exitTicker" placeholder="ADRO"></div>
+<div class="form-group" style="margin:0"><label>Entry Price</label><input type="number" id="exitEntry" placeholder="2620"></div>
+<div class="form-group" style="margin:0"><label>Lot</label><input type="number" id="exitLot" placeholder="10"></div>
+<div class="form-group" style="margin:0"><label>Trail %</label><input type="number" id="exitTrail" value="5" step="0.5"></div>
+<button onclick="addPosition()">+ Tambah Posisi</button>
+</div>
+<div class="grid">
+<div class="stat-box"><div class="stat-label">Nilai Porto</div><div class="stat-value" id="exitPortoVal">-</div></div>
+<div class="stat-box"><div class="stat-label">Unrealized P/L</div><div class="stat-value" id="exitPL">-</div></div>
+<div class="stat-box"><div class="stat-label">Di Bawah Stop</div><div class="stat-value neg" id="exitBelowStop">-</div></div>
+<div class="stat-box"><div class="stat-label">Aksi Minggu Ini</div><div class="stat-value" id="exitAction">-</div></div>
+</div>
+<div class="scroll-table">
+<table id="exitTable">
+<thead><tr><th>Saham</th><th>Sektor</th><th>Entry</th><th>Harga Kini</th><th>Peak High</th><th>Lot</th><th>Trail %</th><th>Stop Price</th><th>P/L %</th><th>ATR</th><th>RSI</th><th>Status</th><th>Aksi</th><th>Hapus</th></tr></thead>
+<tbody></tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- TAB 4: RE-ENTRY -->
+<div id="reentry" class="tab-content">
+<div class="card">
+<h2>Re-Entry Teknikal Mingguan</h2>
+<h3>Posisi Terbuka</h3>
+<div class="scroll-table"><table id="reentryOpenTable"><thead><tr><th>Saham</th><th>Sektor</th><th>Harga</th><th>RSI-W</th><th>VS MA20-W (%)</th><th>Tren MA20-W</th><th>MOM-4W (%)</th><th>Verdict</th><th>Catatan</th></tr></thead><tbody></tbody></table></div>
+<h3>Kandidat Re-Entry — Watchlist</h3>
+<div class="scroll-table"><table id="reentryCandTable"><thead><tr><th>Saham</th><th>Sektor</th><th>Harga</th><th>RSI-W</th><th>VS MA20-W (%)</th><th>Tren MA20-W</th><th>MOM-4W (%)</th><th>Verdict</th><th>Catatan</th></tr></thead><tbody></tbody></table></div>
+</div>
+</div>
+
+<!-- TAB 5: YAHOO SCREENER -->
+<div id="yahoo" class="tab-content">
+<div class="card">
+<h2>Yahoo Screener 18-Kolom</h2>
+<div class="scroll-table">
+<table id="yahooTable">
+<thead><tr><th>Kode</th><th>Harga</th><th>Chg%</th><th>EMA20</th><th>EMA50</th><th>VWAP</th><th>RSI</th><th>Stoch K/D</th><th>ADX</th><th>+DI/-DI</th><th>ATR</th><th>BB Basis</th><th>Vol×Avg</th><th>PER</th><th>PBV</th><th>Skor</th><th>Sinyal</th><th>SL/TP</th></tr></thead>
+<tbody></tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- TAB 6: SHARIA -->
+<div id="sharia" class="tab-content">
+<div class="card">
+<h2>MSCI Sharia Screener + AI Speedometer</h2>
+<div class="scroll-table">
+<table id="shariaTable">
+<thead><tr><th>Ticker</th><th>Harga</th><th>Trend</th><th>ADX</th><th>VWAP</th><th>SRSI</th><th>AI Score</th><th>Speedo</th><th>Signal</th><th>SL</th><th>TP</th><th>Lot</th></tr></thead>
+<tbody></tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- TAB 7: ROTASI -->
+<div id="rotasi" class="tab-content">
+<div class="card">
+<h2>Rotasi Sektor & Protokol Re-Entry</h2>
+<div class="rule-box"><b>Momentum > 5% + Above MA20</b> → OVERWEIGHT</div>
+<div class="rule-box"><b>Momentum 0-5% + Around MA20</b> → MARKET WEIGHT</div>
+<div class="rule-box"><b>Momentum < 0% + Below MA20</b> → UNDERWEIGHT</div>
+<div class="scroll-table">
+<table id="rotasiTable">
+<thead><tr><th>Sektor</th><th>Performa 4W</th><th>% Above MA20</th><th>Avg RSI</th><th>Skor Momentum</th><th>Aksi Rotasi</th></tr></thead>
+<tbody></tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- TAB 8: ALOKASI -->
+<div id="alokasi" class="tab-content">
+<div class="card">
+<h2>Alokasi Sektor & Watchlist</h2>
+<div class="scroll-table">
+<table id="alokasiTable">
+<thead><tr><th>Sektor</th><th>Saham</th><th>Nilai (Rp)</th><th>% Porto</th><th>Target %</th><th>Aksi</th></tr></thead>
+<tbody></tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- TAB 9: SIMULASI -->
+<div id="simulasi" class="tab-content">
+<div class="card">
+<h2>Simulasi Alokasi Ulang</h2>
+<div class="grid">
+<div class="stat-box"><div class="stat-label">Total Porto</div><div class="stat-value" id="simTotal">-</div></div>
+<div class="stat-box"><div class="stat-label">Trim</div><div class="stat-value" id="simTrim">-</div></div>
+<div class="stat-box"><div class="stat-label">Kas Target</div><div class="stat-value" id="simCash">-</div></div>
+<div class="stat-box"><div class="stat-label">Turnover</div><div class="stat-value" id="simTurnover">-</div></div>
+</div>
+<div class="grid">
+<div class="form-group"><label>Target Cash %</label><input type="number" id="simTargetCash" value="15" oninput="renderSimulasi()"></div>
+<div class="form-group"><label>Maks Sektor %</label><input type="number" id="simMaxSektor" value="35" oninput="renderSimulasi()"></div>
+</div>
+<div class="scroll-table">
+<table id="simulasiTable">
+<thead><tr><th>Sektor</th><th>Sekarang</th><th>Target</th><th>Aksi</th></tr></thead>
+<tbody></tbody>
+</table>
+</div>
+</div>
+</div>
+
+<!-- TAB 10: TELEGRAM -->
+<div id="telegram" class="tab-content">
+<div class="card">
+<h2>Integrasi Notifikasi Telegram</h2>
+<div class="grid">
+<div class="form-group"><label>Bot Token (@BotFather)</label><input type="text" id="tgToken" placeholder="123456:ABC-DEF..."></div>
+<div class="form-group"><label>Chat ID</label><input type="text" id="tgChatId" placeholder="123456789"></div>
+</div>
+<button onclick="sendTelegram('Test: IDX Pro Unified terhubung! 🚀')">Kirim Tes</button>
+<button class="secondary" onclick="sendTelegram(generateSignalSummary())">Scan & Kirim Sinyal</button>
+<div id="tgLog" style="margin-top:15px;color:var(--muted);font-size:12px">Belum ada aktivitas.</div>
+</div>
+</div>
+</div>
+
+<script>
+// ==========================================
+// 1. STATE — 36 SAHAM MSCI & SYARIAH
+// ==========================================
+const DEFAULT_STOCKS = [
+    // PERBANKAN (4)
+    {t:'BBCA',s:'Perbankan'},{t:'BBRI',s:'Perbankan'},{t:'BMRI',s:'Perbankan'},{t:'BBNI',s:'Perbankan'},
+    // KONSUMER (5)
+    {t:'ICBP',s:'Konsumer'},{t:'INDF',s:'Konsumer'},{t:'UNVR',s:'Konsumer'},{t:'MYOR',s:'Konsumer'},{t:'SIDO',s:'Konsumer'},
+    // TELEKOMUNIKASI (3)
+    {t:'TLKM',s:'Telekomunikasi'},{t:'EXCL',s:'Telekomunikasi'},{t:'ISAT',s:'Telekomunikasi'},
+    // BATUBARA (3)
+    {t:'ADRO',s:'Batubara'},{t:'PTBA',s:'Batubara'},{t:'ITMG',s:'Batubara'},
+    // PERTAMBANGAN (4)
+    {t:'ANTM',s:'Pertambangan'},{t:'TINS',s:'Pertambangan'},{t:'MDKA',s:'Pertambangan'},{t:'INCO',s:'Pertambangan'},
+    // ALAT BERAT (1)
+    {t:'UNTR',s:'Alat Berat'},
+    // SEMEN (2)
+    {t:'SMGR',s:'Semen'},{t:'INTP',s:'Semen'},
+    // INFRASTRUKTUR (3)
+    {t:'ASII',s:'Infrastruktur'},{t:'JSMR',s:'Infrastruktur'},{t:'PGAS',s:'Infrastruktur'},
+    // PROPERTI (4)
+    {t:'CTRA',s:'Properti'},{t:'BSDE',s:'Properti'},{t:'SMRA',s:'Properti'},{t:'PWON',s:'Properti'},
+    // KESEHATAN (2)
+    {t:'KLBF',s:'Kesehatan'},{t:'SILO',s:'Kesehatan'},
+    // PETERNAKAN (3)
+    {t:'CPIN',s:'Peternakan'},{t:'JPFA',s:'Peternakan'},{t:'AALI',s:'Peternakan'},
+    // TEKNOLOGI (1)
+    {t:'GOTO',s:'Teknologi'},
+    // ENERGI (1)
+    {t:'AKRA',s:'Energi'}
+];
+
+let state = {
+    watchlist: [],
+    data: {},
+    portfolio: {},
+    autoSyncInterval: null,
+    sectorFilter: 'ALL'
+};
+
+function saveState() {
+    localStorage.setItem('idx_watchlist', JSON.stringify(state.watchlist));
+    localStorage.setItem('idx_portfolio', JSON.stringify(state.portfolio));
+}
+
+function loadState() {
+    try {
+        const wl = JSON.parse(localStorage.getItem('idx_watchlist'));
+        const pf = JSON.parse(localStorage.getItem('idx_portfolio'));
+        if (wl && wl.length > 0) state.watchlist = wl;
+        else state.watchlist = [...DEFAULT_STOCKS];
+        if (pf) state.portfolio = pf;
+    } catch(e) {
+        state.watchlist = [...DEFAULT_STOCKS];
+    }
+}
+
+function getTickers() { 
+    if (state.sectorFilter === 'ALL') return state.watchlist.map(w => w.t);
+    return state.watchlist.filter(w => w.s === state.sectorFilter).map(w => w.t);
+}
+function getSector(t) { const w = state.watchlist.find(x => x.t === t); return w ? w.s : 'Lainnya'; }
+
+// ==========================================
+// 2. WATCHLIST MANAGEMENT
+// ==========================================
+function renderTags() {
+    const el = document.getElementById('watchlistTags');
+    el.innerHTML = state.watchlist.map(w =>
+        `<span class="tag">${w.t} <small>(${w.s})</small><span class="x" onclick="removeStock('${w.t}')">✕</span></span>`
+    ).join('');
+    document.getElementById('totalStocks').textContent = state.watchlist.length;
+    renderSectorFilter();
+}
+
+function renderSectorFilter() {
+    const sectors = ['ALL', ...new Set(state.watchlist.map(w => w.s))].sort();
+    const el = document.getElementById('sectorFilter');
+    el.innerHTML = sectors.map(s => 
+        `<button class="sector-btn ${state.sectorFilter===s?'active':''}" onclick="setSectorFilter('${s}')">${s} ${s!=='ALL'?'('+state.watchlist.filter(w=>w.s===s).length+')':''}</button>`
+    ).join('');
+}
+
+function setSectorFilter(s) {
+    state.sectorFilter = s;
+    renderSectorFilter();
+    renderWatchlist();
+}
+
+function addStock() {
+    const ticker = document.getElementById('inputTicker').value.trim().toUpperCase();
+    const sector = document.getElementById('inputSector').value;
+    if (!ticker) return alert('Ketik kode saham!');
+    if (ticker.length < 2 || ticker.length > 6) return alert('Kode saham 2-6 karakter!');
+    if (state.watchlist.find(w => w.t === ticker)) return alert(ticker + ' sudah ada!');
+    state.watchlist.push({t: ticker, s: sector});
+    saveState();
+    renderTags();
+    document.getElementById('inputTicker').value = '';
+    syncSingleStock(ticker).then(() => renderAll());
+}
+
+function removeStock(ticker) {
+    if (!confirm(`Hapus ${ticker} dari watchlist?`)) return;
+    state.watchlist = state.watchlist.filter(w => w.t !== ticker);
+    delete state.data[ticker];
+    delete state.portfolio[ticker];
+    saveState();
+    renderTags();
+    renderAll();
+}
+
+function loadDefaultWatchlist() {
+    if (!confirm('Muat 36 saham default MSCI & Syariah? Saham yang sudah ada tidak akan dihapus.')) return;
+    DEFAULT_STOCKS.forEach(ds => {
+        if (!state.watchlist.find(w => w.t === ds.t)) state.watchlist.push(ds);
+    });
+    saveState();
+    renderTags();
+    syncAllData();
+}
+
+function clearWatchlist() {
+    if (!confirm('Kosongkan semua watchlist?')) return;
+    state.watchlist = [];
+    state.data = {};
+    saveState();
+    renderTags();
+    renderAll();
+}
+
+function addPosition() {
+    const t = document.getElementById('exitTicker').value.trim().toUpperCase();
+    const entry = parseFloat(document.getElementById('exitEntry').value);
+    const lot = parseInt(document.getElementById('exitLot').value);
+    const trail = parseFloat(document.getElementById('exitTrail').value) || 5;
+    if (!t || !entry || !lot) return alert('Lengkapi kode, entry, dan lot!');
+    if (!state.watchlist.find(w => w.t === t)) {
+        state.watchlist.push({t, s: 'Lainnya'});
+        renderTags();
+    }
+    state.portfolio[t] = {entry, lot, peak: entry, trailPct: trail};
+    saveState();
+    syncSingleStock(t).then(() => renderAll());
+}
+
+function removePosition(ticker) {
+    if (!confirm(`Hapus posisi ${ticker}?`)) return;
+    delete state.portfolio[ticker];
+    saveState();
+    renderAll();
+}
+
+// ==========================================
+// 3. TECHNICAL INDICATORS
+// ==========================================
+function calcEMA(data, period) {
+    if (data.length < period) return data[data.length-1] || 0;
+    const k = 2/(period+1);
+    let ema = data.slice(0,period).reduce((a,b)=>a+b,0)/period;
+    for (let i=period;i<data.length;i++) ema = data[i]*k + ema*(1-k);
+    return ema;
+}
+function calcSMA(data, period) {
+    if (!data.length) return 0;
+    if (data.length < period) return data.reduce((a,b)=>a+b,0)/data.length;
+    return data.slice(-period).reduce((a,b)=>a+b,0)/period;
+}
+function calcStdDev(data, period) {
+    if (data.length < period) return 0;
+    const s = data.slice(-period), m = s.reduce((a,b)=>a+b,0)/period;
+    return Math.sqrt(s.reduce((a,b)=>a+Math.pow(b-m,2),0)/period);
+}
+function calcATR(hist, p=14) {
+    if (hist.length < p+1) return 0;
+    let s=0;
+    for (let i=hist.length-p;i<hist.length;i++) {
+        const h=hist[i].high,l=hist[i].low,pc=hist[i-1].close;
+        s+=Math.max(h-l,Math.abs(h-pc),Math.abs(l-pc));
+    }
+    return s/p;
+}
+function calcRSI(hist, p=14) {
+    if (hist.length < p+1) return 50;
+    let g=0,l=0;
+    for (let i=hist.length-p;i<hist.length;i++) {
+        const d=hist[i].close-hist[i-1].close;
+        if(d>0)g+=d;else l-=d;
+    }
+    if(l===0)return 100;
+    return 100-(100/(1+(g/p)/(l/p)));
+}
+function calcStoch(hist, kp=14, dp=3) {
+    if (hist.length<kp) return {k:50,d:50};
+    const r=hist.slice(-kp), hi=Math.max(...r.map(x=>x.high)), lo=Math.min(...r.map(x=>x.low)), c=hist[hist.length-1].close;
+    const k=hi===lo?50:((c-lo)/(hi-lo))*100;
+    return {k, d:k};
+}
+function calcADX(hist, p=14) {
+    if (hist.length<p*2) return {adx:25,pdi:20,mdi:20};
+    const tr=[],pdm=[],mdm=[];
+    for(let i=1;i<hist.length;i++){
+        const h=hist[i].high,l=hist[i].low,pc=hist[i-1].close;
+        const u=h-hist[i-1].high,dn=hist[i-1].low-l;
+        tr.push(Math.max(h-l,Math.abs(h-pc),Math.abs(l-pc)));
+        pdm.push(u>dn&&u>0?u:0);
+        mdm.push(dn>u&&dn>0?dn:0);
+    }
+    let atr=tr.slice(0,p).reduce((a,b)=>a+b,0),ap=pdm.slice(0,p).reduce((a,b)=>a+b,0),am=mdm.slice(0,p).reduce((a,b)=>a+b,0);
+    const dx=[];
+    for(let i=p;i<tr.length;i++){
+        atr=atr-atr/p+tr[i];ap=ap-ap/p+pdm[i];am=am-am/p+mdm[i];
+        const pdi=(ap/atr)*100,mdi=(am/atr)*100,ds=pdi+mdi;
+        dx.push({dx:ds===0?0:(Math.abs(pdi-mdi)/ds)*100,pdi,mdi});
+    }
+    if(dx.length<p)return{adx:25,pdi:dx[dx.length-1]?.pdi||20,mdi:dx[dx.length-1]?.mdi||20};
+    let adx=dx.slice(0,p).reduce((a,b)=>a+b.dx,0);
+    for(let i=p;i<dx.length;i++)adx=adx-adx/p+dx[i].dx;
+    const la=dx[dx.length-1];
+    return{adx:adx/p,pdi:la.pdi,mdi:la.mdi};
+}
+function calcVWAP(hist, p=20) {
+    const s=hist.slice(-p);let pv=0,v=0;
+    for(const b of s){pv+=(b.high+b.low+b.close)/3*b.volume;v+=b.volume;}
+    return v===0?hist[hist.length-1].close:pv/v;
+}
+function calcBB(hist, p=20, m=2) {
+    const c=hist.slice(-p).map(h=>h.close),b=c.reduce((a,x)=>a+x,0)/c.length,sd=calcStdDev(c,p);
+    return{basis:b,upper:b+m*sd,lower:b-m*sd};
+}
+function calcMom(hist, w=4) {
+    const d=w*5;if(hist.length<d+1)return 0;
+    return((hist[hist.length-1].close-hist[hist.length-1-d].close)/hist[hist.length-1-d].close)*100;
+}
+
+// ==========================================
+// 4. DATA FETCHING — REAL-TIME
+// ==========================================
+async function fetchQuotes(tickers) {
+    if(!tickers.length) return {};
+    // Yahoo v7 quote API membatasi ~50 simbol per request, kita bagi batch
+    const results = {};
+    const batchSize = 30;
+    for (let i = 0; i < tickers.length; i += batchSize) {
+        const batch = tickers.slice(i, i + batchSize);
+        const symbols = batch.map(t=>t+'.JK').join(',');
+        const url = `https://query2.finance.yahoo.com/v7/finance/quote?symbols=${symbols}`;
+        const proxies = [
+            `https://corsproxy.io/?${encodeURIComponent(url)}`,
+            `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+        ];
+        for(const pu of proxies){
+            try{
+                const r=await fetch(pu,{headers:{'Cache-Control':'no-cache'}});
+                if(!r.ok)continue;
+                const j=await r.json();
+                if(!j.quoteResponse?.result)continue;
+                for(const q of j.quoteResponse.result){
+                    const t=q.symbol.replace('.JK','');
+                    results[t]={price:q.regularMarketPrice,prevClose:q.regularMarketPreviousClose,changePct:q.regularMarketChangePercent,per:q.trailingPE,pbv:q.priceToBook,roe:q.returnOnEquity?q.returnOnEquity*100:null,volume:q.regularMarketVolume};
+                }
+                break;
+            }catch(e){continue;}
+        }
+    }
+    return results;
+}
+
+async function fetchChart(ticker) {
+    const url=`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}.JK?range=1y&interval=1d`;
+    const proxies=[`https://corsproxy.io/?${encodeURIComponent(url)}`,`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`];
+    for(const pu of proxies){
+        try{
+            const r=await fetch(pu);if(!r.ok)continue;
+            const j=await r.json();const res=j.chart.result[0];const q=res.indicators.quote[0];
+            const h=[];
+            for(let i=0;i<res.timestamp.length;i++){
+                if(q.close[i]!==null)h.push({open:q.open[i],high:q.high[i],low:q.low[i],close:q.close[i],volume:q.volume[i]||0});
+            }
+            return h;
+        }catch(e){continue;}
+    }
+    return fallbackChart(ticker);
+}
+
+function fallbackChart(ticker) {
+    const base={'BBCA':10500,'BBRI':5800,'BMRI':6800,'BBNI':5500,'TLKM':3200,'ASII':5200,'ADRO':2620,'PTBA':2800,'ITMG':22000,'UNTR':22000,'SMGR':4500,'INCO':5200,'ANTM':1700,'TINS':1500,'MDKA':2800,'KLBF':1500,'ICBP':5200,'INDF':6500,'UNVR':3000,'MYOR':5500,'SIDO':1100,'EXCL':1500,'ISAT':18000,'JSMR':7500,'PGAS':1600,'CTRA':1800,'BSDE':1200,'SMRA':600,'PWON':800,'CPIN':6500,'JPFA':1500,'AALI':8500,'GOTO':60,'AKRA':1800,'INTP':9000,'SILO':500}[ticker]||1000;
+    const h=[];let p=base*0.9;
+    for(let i=0;i<250;i++){p+=(Math.random()-0.48)*(base*0.02);h.push({open:p,high:p*1.01,low:p*0.99,close:p,volume:Math.random()*1e7});}
+    return h;
+}
+
+async function syncSingleStock(ticker) {
+    const [quotes, hist] = await Promise.all([fetchQuotes([ticker]), fetchChart(ticker)]);
+    const q = quotes[ticker] || {};
+    const price = q.price || hist[hist.length-1]?.close || 0;
+    const prev = q.prevClose || hist[hist.length-2]?.close || price;
+    const closes = hist.map(h=>h.close);
+    state.data[ticker] = {
+        price, change: q.changePct || ((price-prev)/prev*100),
+        sector: getSector(ticker), per:q.per, pbv:q.pbv, roe:q.roe,
+        volume: q.volume||hist[hist.length-1]?.volume||0,
+        ema20:calcEMA(closes,20), ema50:calcEMA(closes,50),
+        rsi:calcRSI(hist), stoch:calcStoch(hist), adx:calcADX(hist),
+        vwap:calcVWAP(hist), atr:calcATR(hist), bb:calcBB(hist),
+        mom4w:calcMom(hist), avgVol:calcSMA(hist.map(h=>h.volume),20), hist
+    };
+}
+
+async function syncAllData() {
+    const tickers = state.watchlist.map(w=>w.t);
+    if(!tickers.length){document.getElementById('lastSync').textContent='Tidak ada saham';return;}
+    document.getElementById('lastSync').innerHTML='<span class="loader"></span> Syncing '+tickers.length+' saham...';
+    
+    // Fetch quotes dalam batch, chart paralel
+    const [quotes, ...charts] = await Promise.all([
+        fetchQuotes(tickers),
+        ...tickers.map(t=>fetchChart(t))
+    ]);
+    
+    tickers.forEach((t,i)=>{
+        const hist=charts[i], q=quotes[t]||{};
+        const price=q.price||hist[hist.length-1]?.close||0;
+        const prev=q.prevClose||hist[hist.length-2]?.close||price;
+        const closes=hist.map(h=>h.close);
+        state.data[t]={
+            price, change:q.changePct||((price-prev)/prev*100),
+            sector:getSector(t), per:q.per, pbv:q.pbv, roe:q.roe,
+            volume:q.volume||hist[hist.length-1]?.volume||0,
+            ema20:calcEMA(closes,20), ema50:calcEMA(closes,50),
+            rsi:calcRSI(hist), stoch:calcStoch(hist), adx:calcADX(hist),
+            vwap:calcVWAP(hist), atr:calcATR(hist), bb:calcBB(hist),
+            mom4w:calcMom(hist), avgVol:calcSMA(hist.map(h=>h.volume),20), hist
+        };
+    });
+    
+    document.getElementById('lastSync').textContent=new Date().toLocaleTimeString()+' ('+tickers.length+' saham)';
+    renderAll();
+}
+
+// ==========================================
+// 5. RENDER ALL
+// ==========================================
+function fmt(n,d=0){return n==null||isNaN(n)?'-':Number(n).toLocaleString('id-ID',{minimumFractionDigits:d,maximumFractionDigits:d});}
+
+function renderAll(){
+    renderWatchlist();renderMM();renderExit();renderReentry();
+    renderYahoo();renderSharia();renderRotasi();renderAlokasi();
+    renderSimulasi();calcDashboard();
+    if(document.getElementById("smartScanner")) renderSmartScanner();
+}
+
+function renderWatchlist(){
+    const tb=document.querySelector('#watchlistTable tbody');tb.innerHTML='';
+    getTickers().forEach(t=>{
+        const d=state.data[t];if(!d)return;
+        const tr=d.price>d.ema20?'Uptrend':'Downtrend',bg=tr==='Uptrend'?'badge-buy':'badge-sell';
+        tb.innerHTML+=`<tr>
+            <td><b>${t}</b></td><td>${d.sector}</td>
+            <td class="num">${fmt(d.price)}</td>
+            <td class="num ${d.change>=0?'pos':'neg'}">${fmt(d.change,2)}%</td>
+            <td class="num">${d.roe?fmt(d.roe,1)+'%':'-'}</td>
+            <td class="num">${d.per?fmt(d.per,1):'-'}</td>
+            <td class="num">${d.pbv?fmt(d.pbv,2):'-'}</td>
+            <td class="num">${fmt(d.volume/1e6,1)}M</td>
+            <td class="num">${fmt(d.atr)}</td>
+            <td class="num">${fmt(d.rsi,1)}</td>
+            <td><span class="badge ${bg}">${tr}</span></td>
+            <td><button class="sm danger" onclick="removeStock('${t}')">✕</button></td>
+        </tr>`;
+    });
+}
+
+function renderMM(){
+    const modal=+document.getElementById('mmModal').value||0;
+    const rp=+document.getElementById('mmRisk').value||0;
+    const sl=+document.getElementById('mmSLMult').value||2;
+    const rr=+document.getElementById('mmRR').value||3;
+    const mr=modal*(rp/100);
+    const tb=document.querySelector('#mmTable tbody');tb.innerHTML='';
+    getTickers().forEach(t=>{
+        const d=state.data[t];if(!d)return;
+        const isP=!!state.portfolio[t],p=state.portfolio[t]||{entry:d.price,lot:0};
+        const stop=d.price-d.atr*sl, tp1=d.price+d.atr*sl*rr, tp2=d.price+d.atr*sl*rr*1.5;
+        const trail=isP?p.peak*(1-p.trailPct/100):stop;
+        const pl=((d.price-p.entry)/p.entry)*100;
+        const rpl=(d.price-stop)*100, lots=rpl>0?Math.floor(mr/rpl):0, dana=lots*100*d.price;
+        let sig='HOLD',bg='badge-hold',al='-';
+        if(d.price>d.ema20&&d.rsi>40&&d.rsi<70&&d.adx.adx>25){sig='BUY';bg='badge-buy';al='Trend+Momentum OK';}
+        else if(d.price<d.ema20&&d.rsi<30){sig='WAIT';bg='badge-warn';al='Oversold';}
+        else if(d.rsi>75){sig='AVOID';bg='badge-sell';al='Overbought';}
+        else if(d.price>d.ema20){sig='WATCH';bg='badge-hold';al='Trend up';}
+        const st=isP?'OPEN':'WATCH',sb=isP?'badge-buy':'badge-hold';
+        const ak=isP?(d.price<=trail?'EXIT':'HOLD'):(sig==='BUY'?'OPEN':'WAIT');
+        const ab=ak==='EXIT'?'badge-sell':ak==='OPEN'?'badge-buy':'badge-hold';
+        tb.innerHTML+=`<tr>
+            <td><b>${t}</b></td><td><span class="badge ${sb}">${st}</span></td>
+            <td class="num">${fmt(p.entry)}</td><td class="num">${fmt(d.price)}</td>
+            <td class="num ${d.change>=0?'pos':'neg'}">${fmt(d.change,2)}%</td>
+            <td class="num ${pl>=0?'pos':'neg'}">${fmt(pl,2)}%</td>
+            <td class="num">${fmt(d.atr)}</td>
+            <td class="num">${d.per?fmt(d.per,1):'-'}/${d.pbv?fmt(d.pbv,2):'-'}</td>
+            <td><span class="badge ${bg}">${sig}</span></td>
+            <td class="num neg">${fmt(stop)}</td><td class="num warn">${fmt(trail)}</td>
+            <td class="num pos">${fmt(tp1)}/${fmt(tp2)}</td>
+            <td class="num"><b>${lots}</b></td><td class="num">${fmt(dana)}</td>
+            <td class="num">${fmt(mr)}</td><td>${al}</td>
+            <td><span class="badge ${ab}">${ak}</span></td>
+        </tr>`;
+    });
+}
+
+function renderExit(){
+    const tb=document.querySelector('#exitTable tbody');tb.innerHTML='';
+    let tv=0,tpl=0,bs=0,hc=0,ec=0;
+    Object.keys(state.portfolio).forEach(t=>{
+        const d=state.data[t];if(!d)return;
+        const p=state.portfolio[t];
+        if(d.price>p.peak)p.peak=d.price;
+        const stop=p.peak*(1-p.trailPct/100),pl=((d.price-p.entry)/p.entry)*100;
+        const val=p.lot*100*d.price,plRp=(d.price-p.entry)*p.lot*100;
+        tv+=val;tpl+=plRp;
+        if(d.price<=stop){bs+=val;ec++;}else hc++;
+        const st=d.price<=stop?'TRIGGERED':d.price<=stop*1.03?'APPROACHING':'SAFE';
+        const sb=st==='TRIGGERED'?'badge-sell':st==='APPROACHING'?'badge-warn':'badge-buy';
+        const ak=st==='TRIGGERED'?'EXIT':st==='APPROACHING'?'TRIM':'HOLD';
+        const ab=ak==='EXIT'?'badge-sell':ak==='TRIM'?'badge-warn':'badge-buy';
+        tb.innerHTML+=`<tr>
+            <td><b>${t}</b></td><td>${getSector(t)}</td>
+            <td class="num">${fmt(p.entry)}</td><td class="num">${fmt(d.price)}</td>
+            <td class="num pos">${fmt(p.peak)}</td><td class="num">${p.lot}</td>
+            <td class="num">${p.trailPct}%</td><td class="num neg">${fmt(stop)}</td>
+            <td class="num ${pl>=0?'pos':'neg'}">${fmt(pl,2)}%</td>
+            <td class="num">${fmt(d.atr)}</td><td class="num">${fmt(d.rsi,1)}</td>
+            <td><span class="badge ${sb}">${st}</span></td>
+            <td><span class="badge ${ab}">${ak}</span></td>
+            <td><button class="sm danger" onclick="removePosition('${t}')">✕</button></td>
+        </tr>`;
+    });
+    document.getElementById('exitPortoVal').textContent='Rp '+fmt(tv);
+    const pe=document.getElementById('exitPL');pe.textContent='Rp '+fmt(tpl);pe.className='stat-value '+(tpl>=0?'pos':'neg');
+    document.getElementById('exitBelowStop').textContent='Rp '+fmt(bs);
+    document.getElementById('exitAction').textContent=`${hc} HOLD · ${ec} EXIT`;
+}
+
+function renderReentry(){
+    const render=(id,list)=>{
+        const tb=document.querySelector(`#${id} tbody`);tb.innerHTML='';
+        list.forEach(t=>{
+            const d=state.data[t];if(!d)return;
+            const vs=((d.price-d.ema20)/d.ema20)*100,tr=d.price>d.ema20?'Naik':'Turun';
+            let v='TUNGGU',bg='badge-hold',n='Menunggu sinyal';
+            if(d.rsi<35&&vs<-5&&d.mom4w<0){v='PANTAU REVERSAL';bg='badge-warn';n='Oversold';}
+            else if(d.rsi>50&&vs>0&&d.mom4w>0){v='BELI';bg='badge-buy';n='Breakout valid';}
+            else if(d.rsi>75){v='HINDARI';bg='badge-sell';n='Overbought';}
+            else if(d.rsi>40&&d.rsi<60&&Math.abs(vs)<3){v='AKUMULASI';bg='badge-buy';n='Konsolidasi';}
+            tb.innerHTML+=`<tr>
+                <td><b>${t}</b></td><td>${getSector(t)}</td><td class="num">${fmt(d.price)}</td>
+                <td class="num">${fmt(d.rsi,1)}</td><td class="num ${vs>=0?'pos':'neg'}">${fmt(vs,2)}%</td>
+                <td>${tr}</td><td class="num ${d.mom4w>=0?'pos':'neg'}">${fmt(d.mom4w,2)}%</td>
+                <td><span class="badge ${bg}">${v}</span></td><td>${n}</td>
+            </tr>`;
+        });
+    };
+    render('reentryOpenTable',Object.keys(state.portfolio));
+    render('reentryCandTable',getTickers().filter(t=>!state.portfolio[t]));
+}
+
+function renderYahoo(){
+    const tb=document.querySelector('#yahooTable tbody');tb.innerHTML='';
+    getTickers().forEach(t=>{
+        const d=state.data[t];if(!d)return;
+        const vr=d.avgVol>0?d.volume/d.avgVol:1;
+        let sc=50;
+        if(d.price>d.ema20)sc+=10;if(d.price>d.ema50)sc+=10;
+        if(d.rsi>40&&d.rsi<65)sc+=10;if(d.adx.adx>25)sc+=10;
+        if(d.adx.pdi>d.adx.mdi)sc+=10;if(vr>1.2)sc+=10;
+        let sig='HOLD',bg='badge-hold';
+        if(sc>=75){sig='STRONG BUY';bg='badge-buy';}else if(sc>=60){sig='BUY';bg='badge-buy';}else if(sc<35){sig='SELL';bg='badge-sell';}
+        const sl=d.price-d.atr*2,tp=d.price+d.atr*3;
+        tb.innerHTML+=`<tr>
+            <td><b>${t}</b></td><td class="num">${fmt(d.price)}</td>
+            <td class="num ${d.change>=0?'pos':'neg'}">${fmt(d.change,2)}%</td>
+            <td class="num">${fmt(d.ema20)}</td><td class="num">${fmt(d.ema50)}</td>
+            <td class="num">${fmt(d.vwap)}</td><td class="num">${fmt(d.rsi,1)}</td>
+            <td class="num">${fmt(d.stoch.k,1)}/${fmt(d.stoch.d,1)}</td>
+            <td class="num">${fmt(d.adx.adx,1)}</td>
+            <td class="num">${fmt(d.adx.pdi,1)}/${fmt(d.adx.mdi,1)}</td>
+            <td class="num">${fmt(d.atr)}</td><td class="num">${fmt(d.bb.basis)}</td>
+            <td class="num">${fmt(vr,2)}x</td>
+            <td class="num">${d.per?fmt(d.per,1):'-'}</td><td class="num">${d.pbv?fmt(d.pbv,2):'-'}</td>
+            <td class="num"><b>${sc}</b></td><td><span class="badge ${bg}">${sig}</span></td>
+            <td class="num">${fmt(sl)}/${fmt(tp)}</td>
+        </tr>`;
+    });
+}
+
+function renderSharia(){
+    const tb=document.querySelector('#shariaTable tbody');tb.innerHTML='';
+    const modal=+document.getElementById('mmModal')?.value||1e8,rp=+document.getElementById('mmRisk')?.value||2,mr=modal*(rp/100);
+    getTickers().forEach(t=>{
+        const d=state.data[t];if(!d)return;
+        const tr=d.price>d.ema20&&d.adx.pdi>d.adx.mdi?'Bullish':'Bearish',sr=d.stoch.k;
+        let sc=50;
+        if(tr==='Bullish')sc+=15;if(d.rsi>40&&d.rsi<65)sc+=10;
+        if(d.adx.adx>25)sc+=10;if(d.price>d.vwap)sc+=10;if(sr>20&&sr<80)sc+=5;
+        let sig='HOLD',bg='badge-hold',sp='🟡';
+        if(sc>=75){sig='STRONG BUY';bg='badge-buy';sp='🟢';}else if(sc>=60){sig='BUY';bg='badge-buy';sp='🟢';}else if(sc<40){sig='SELL';bg='badge-sell';sp='🔴';}
+        const sl=d.price-d.atr*2,tp=d.price+d.atr*3,rpl=(d.price-sl)*100,lo=rpl>0?Math.floor(mr/rpl):0;
+        tb.innerHTML+=`<tr>
+            <td><b>${t}</b></td><td class="num">${fmt(d.price)}</td><td>${tr}</td>
+            <td class="num">${fmt(d.adx.adx,1)}</td><td class="num">${fmt(d.vwap)}</td>
+            <td class="num">${fmt(sr,1)}</td><td class="num"><b>${sc}</b></td><td>${sp}</td>
+            <td><span class="badge ${bg}">${sig}</span></td>
+            <td class="num neg">${fmt(sl)}</td><td class="num pos">${fmt(tp)}</td><td class="num">${lo}</td>
+        </tr>`;
+    });
+}
+
+function renderRotasi(){
+    const tb=document.querySelector('#rotasiTable tbody');tb.innerHTML='';
+    const sd={};
+    getTickers().forEach(t=>{
+        const d=state.data[t];if(!d)return;
+        const s=d.sector;if(!sd[s])sd[s]={m:[],a:0,r:[],c:0};
+        sd[s].m.push(d.mom4w);sd[s].r.push(d.rsi);
+        if(d.price>d.ema20)sd[s].a++;sd[s].c++;
+    });
+    Object.keys(sd).forEach(s=>{
+        const x=sd[s],am=x.m.reduce((a,b)=>a+b,0)/x.m.length,pa=(x.a/x.c)*100,ar=x.r.reduce((a,b)=>a+b,0)/x.r.length,sc=am*10+pa;
+        let ak='MARKET WEIGHT',bg='badge-hold';
+        if(am>5&&pa>60){ak='OVERWEIGHT';bg='badge-buy';}else if(am<0||pa<40){ak='UNDERWEIGHT';bg='badge-sell';}
+        tb.innerHTML+=`<tr><td><b>${s}</b></td><td class="num ${am>=0?'pos':'neg'}">${fmt(am,2)}%</td><td class="num">${fmt(pa,0)}%</td><td class="num">${fmt(ar,1)}</td><td class="num"><b>${fmt(sc,1)}</b></td><td><span class="badge ${bg}">${ak}</span></td></tr>`;
+    });
+}
+
+function renderAlokasi(){
+    const tb=document.querySelector('#alokasiTable tbody');tb.innerHTML='';
+    let tv=0;const sm={};
+    Object.keys(state.portfolio).forEach(t=>{
+        const d=state.data[t];if(!d)return;
+        const v=state.portfolio[t].lot*100*d.price;tv+=v;
+        const s=getSector(t);if(!sm[s])sm[s]={st:[],v:0};
+        sm[s].st.push({t,v});sm[s].v+=v;
+    });
+    Object.keys(sm).forEach(s=>{
+        const x=sm[s],pc=(x.v/tv)*100,tg=Math.min(35,Math.max(15,pc));
+        let ak='HOLD',bg='badge-hold';
+        if(pc>35){ak='TRIM';bg='badge-sell';}else if(pc<15){ak='ADD';bg='badge-buy';}
+        x.st.forEach(st=>{
+            tb.innerHTML+=`<tr><td><b>${s}</b></td><td>${st.t}</td><td class="num">${fmt(st.v)}</td><td class="num">${fmt((st.v/tv)*100,1)}%</td><td class="num">${fmt(tg/x.st.length,1)}%</td><td><span class="badge ${bg}">${ak}</span></td></tr>`;
+        });
+    });
+}
+
+function renderSimulasi(){
+    const tc=+document.getElementById('simTargetCash').value||15,ms=+document.getElementById('simMaxSektor').value||35;
+    let tv=0;const sv={};
+    Object.keys(state.portfolio).forEach(t=>{
+        const d=state.data[t];if(!d)return;
+        const v=state.portfolio[t].lot*100*d.price;tv+=v;
+        const s=getSector(t);sv[s]=(sv[s]||0)+v;
+    });
+    const ct=tv*(tc/100);let tt=0,to=0;
+    const tb=document.querySelector('#simulasiTable tbody');tb.innerHTML='';
+    Object.keys(sv).forEach(s=>{
+        const n=sv[s],np=(n/tv)*100;let tp=np,ak='HOLD',bg='badge-hold';
+        if(np>ms){tp=ms;ak=`TRIM ${fmt(np-ms,1)}%`;bg='badge-sell';tt+=n-(tv*ms/100);to+=Math.abs(n-(tv*ms/100));}
+        else if(np<15){tp=20;ak=`ADD ${fmt(20-np,1)}%`;bg='badge-buy';to+=Math.abs((tv*20/100)-n);}
+        tb.innerHTML+=`<tr><td><b>${s}</b></td><td class="num">${fmt(np,1)}%</td><td class="num">${fmt(tp,1)}%</td><td><span class="badge ${bg}">${ak}</span></td></tr>`;
+    });
+    tb.innerHTML+=`<tr><td><b>Cash</b></td><td>-</td><td class="num">${tc}%</td><td>Buffer</td></tr>`;
+    document.getElementById('simTotal').textContent='Rp '+fmt(tv);
+    document.getElementById('simTrim').textContent='Rp '+fmt(tt);
+    document.getElementById('simCash').textContent='Rp '+fmt(ct);
+    document.getElementById('simTurnover').textContent='Rp '+fmt(to);
+}
+
+function calcDashboard(){
+    let tv=0,tpl=0,dc=0,bs=0;
+    Object.keys(state.portfolio).forEach(t=>{
+        const d=state.data[t];if(!d)return;
+        const p=state.portfolio[t],v=p.lot*100*d.price,c=p.lot*100*p.entry;
+        tv+=v;tpl+=(v-c);dc+=v*(d.change/100);
+        if(d.price<=p.peak*(1-p.trailPct/100))bs+=v;
+    });
+    document.getElementById('totalPortfolio').textContent='Rp '+fmt(tv);
+    const pe=document.getElementById('totalPL');pe.textContent='Rp '+fmt(tpl);pe.className='stat-value '+(tpl>=0?'pos':'neg');
+    const ce=document.getElementById('dailyChange');ce.textContent='Rp '+fmt(dc);ce.className='stat-value '+(dc>=0?'pos':'neg');
+    document.getElementById('belowStop').textContent='Rp '+fmt(bs);
+    let ec=0,tc=0;
+    Object.keys(state.portfolio).forEach(t=>{
+        const d=state.data[t];if(!d)return;const p=state.portfolio[t],st=p.peak*(1-p.trailPct/100);
+        if(d.price<=st)ec++;else if(d.price<=st*1.03)tc++;
+    });
+    document.getElementById('actionSignal').textContent=`${ec} EXIT · ${tc} TRIM`;
+}
+
+// ==========================================
+// 6. TELEGRAM
+// ==========================================
+async function sendTelegram(msg){
+    const tk=document.getElementById('tgToken').value,ci=document.getElementById('tgChatId').value,lg=document.getElementById('tgLog');
+    if(!tk||!ci){lg.innerHTML='<span class="neg">Token & Chat ID wajib!</span>';return;}
+    try{
+        const r=await fetch(`https://api.telegram.org/bot${tk}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:ci,text:msg,parse_mode:'HTML'})});
+        const d=await r.json();
+        lg.innerHTML=d.ok?`<span class="pos">✅ Terkirim ${new Date().toLocaleTimeString()}</span>`:`<span class="neg">❌ ${d.description}</span>`;
+    }catch(e){lg.innerHTML=`<span class="neg">❌ ${e.message}</span>`;}
+}
+
+function generateSignalSummary(){
+    let m=`<b>📊 IDX Pro - Signal Summary (36 MSCI & Syariah)</b>\n\n`;
+    getTickers().forEach(t=>{
+        const d=state.data[t];if(!d)return;
+        m+=`${d.price>d.ema20?'🟢':'🔴'} <b>${t}</b> (${d.sector}): ${fmt(d.price)} (${fmt(d.change,2)}%)\n   RSI:${fmt(d.rsi,1)} ADX:${fmt(d.adx.adx,1)} ATR:${fmt(d.atr)}\n\n`;
+    });
+    return m;
+}
+
+// ==========================================
+// 7. UTILITIES
+// ==========================================
+function switchTab(e,id){
+    document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el=>el.classList.remove('active'));
+    document.getElementById(id).classList.add('active');e.target.classList.add('active');
+}
+function toggleAutoSync(){
+    const l=document.getElementById('autoSyncLabel');
+    if(state.autoSyncInterval){clearInterval(state.autoSyncInterval);state.autoSyncInterval=null;l.textContent='Auto 60s';}
+    else{state.autoSyncInterval=setInterval(syncAllData,60000);l.textContent='Matikan Auto';syncAllData();}
+}
+function resetData(){
+    if(confirm('Reset portofolio ke default?')){
+        state.portfolio={'ADRO':{entry:2500,lot:10,peak:2600,trailPct:5},'PTBA':{entry:2800,lot:5,peak:2900,trailPct:5}};
+        saveState();renderAll();
+    }
+}
+
+// ==========================================
+// INIT
+// ==========================================
+window.onload=()=>{
+    loadState();
+    renderTags();
+    syncAllData();
+};
+
+/* =========================================================
+   SMART SCANNER HYBRID ENGINE
+   Mix: IDX Pro live/Yahoo technical engine + Weakness Rectangle protocol.
+   No order execution. OPEN is a descriptive setup state only.
+========================================================= */
+function ssNum(x,d=2){ return x==null||isNaN(x)?'-':Number(x).toLocaleString('id-ID',{minimumFractionDigits:d,maximumFractionDigits:d}); }
+function ssPct(x){ return x==null||isNaN(x)?'-':(x>=0?'+':'')+ssNum(x,2)+'%'; }
+function ssAvg(a){ return a.length?a.reduce((x,y)=>x+y,0)/a.length:0; }
+function ssLevels(hist){
+  const h=hist||[]; const recent=h.slice(-50), near=h.slice(-20);
+  if(!recent.length) return {support:0,resistance:0,prevSupport:0,prevResistance:0};
+  const lows=near.map(x=>x.low), highs=near.map(x=>x.high);
+  const support=Math.min(...lows), resistance=Math.max(...highs);
+  const prev=h.slice(-50,-20);
+  return {support, resistance, prevSupport:prev.length?Math.min(...prev.map(x=>x.low)):support, prevResistance:prev.length?Math.max(...prev.map(x=>x.high)):resistance};
+}
+function ssRejection(hist, levels){
+  const h=hist||[]; if(h.length<5)return {rejection:false,sweep:false};
+  const c=h[h.length-1], prev=h.slice(-6,-1); const lo=Math.min(...prev.map(x=>x.low)), hi=Math.max(...prev.map(x=>x.high));
+  const lowerWick=Math.min(c.open,c.close)-c.low, upperWick=c.high-Math.max(c.open,c.close), body=Math.abs(c.close-c.open)||1;
+  const sweep=(c.low<lo && c.close>lo)||(c.high>hi && c.close<hi);
+  const rejection=(lowerWick>body*1.2 && c.close>c.open)||(upperWick>body*1.2 && c.close<c.open);
+  return {rejection,sweep};
+}
+function ssFvgProxy(hist){
+  const h=hist||[]; if(h.length<4)return false;
+  const a=h[h.length-3], b=h[h.length-2], c=h[h.length-1];
+  return (c.low>a.high)||(c.high<a.low)||(b.low>a.high)||(b.high<a.low);
+}
+function ssAnalyze(t){
+  const d=state.data[t]; if(!d||!d.hist||d.hist.length<20)return null;
+  const hist=d.hist, price=d.price, atr=Math.max(d.atr||0.0001,0.0001), lv=ssLevels(hist), nearSup=(price-lv.support)/atr, nearRes=(lv.resistance-price)/atr;
+  const volX=d.avgVol?d.volume/d.avgVol:0, ma20=d.ema20||0, ma50=d.ema50||0;
+  const trendUp=price>ma20 && ma20>ma50, trendDown=price<ma20 && ma20<ma50;
+  const prev=hist[hist.length-2], breakout=price>lv.resistance*1.002, breakdown=price<lv.support*0.998;
+  const pullback=(price>=lv.support && nearSup<=1.5 && price>=ma50*0.98);
+  const supportWatch=nearSup>=0 && nearSup<=1.25;
+  const volumeConfirm=volX>=1.25;
+  const momentum=(d.rsi>=50&&d.rsi<=72&&d.adx?.adx>=18);
+  const rejection=ssRejection(hist,lv), weakness=(rejection.rejection||rejection.sweep);
+  const fvg=ssFvgProxy(hist);
+  const maAlign=trendUp;
+  const retest=prev && prev.close>lv.resistance && price<=lv.resistance*1.015 && price>=lv.resistance*0.985;
+  const tp1=price>=lv.resistance+atr*1.0, tp2=price>=lv.resistance+atr*2.0;
+  const valOK=(d.per==null||d.per<=20)&&(d.pbv==null||d.pbv<=3);
+  const cond=[
+    ['Dekat Support',supportWatch],['MA20 > MA50 & harga di atas MA20',maAlign],['Pullback/Retest',pullback||retest],['Breakout Resistance',breakout],['Volume konfirmasi',volumeConfirm],['Momentum RSI/ADX',momentum],['Liquidity sweep / rejection',weakness],['Imbalance/FVG proxy',fvg],['Valuasi tidak ekstrem',valOK],['Harga belum terlalu extended',!tp2]
+  ];
+  const score=cond.filter(x=>x[1]).length;
+  let stage='MONITOR';
+  if(breakdown) stage='EXIT';
+  else if(tp2||tp1) stage='TAKE PROFIT';
+  else if(breakout&&volumeConfirm&&momentum&&maAlign) stage='OPEN';
+  else if(breakout) stage='BREAKOUT';
+  else if(pullback||retest) stage='PULLBACK';
+  else if(supportWatch) stage='WATCH';
+  const priority={EXIT:6,'TAKE PROFIT':5,OPEN:4,BREAKOUT:3,PULLBACK:2,WATCH:1,MONITOR:0}[stage]||0;
+  const reasons=cond.filter(x=>x[1]).map(x=>x[0]);
+  const reason=reasons.slice(0,4).join(' · ')+(reasons.length>4?' · +'+(reasons.length-4)+' kondisi':'');
+  return {t,stage,priority,score,total:cond.length,cond,reason,price,change:d.change,support:lv.support,resistance:lv.resistance,ma20,ma50,rsi:d.rsi,volX,atr,trendUp,trendDown,rejection:rejection.rejection,sweep:rejection.sweep,tp1,tp2,hist};
+}
+function ssEsc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function ssChartSVG(a){
+  const h=a.hist.slice(-70); if(!h.length)return '';
+  const W=760,H=250,pad={l:42,r:48,t:12,b:22}; const iw=W-pad.l-pad.r, ih=H-pad.t-pad.b;
+  const vals=h.flatMap(x=>[x.high,x.low]); const min=Math.min(...vals),max=Math.max(...vals),range=(max-min)||1;
+  const x=i=>pad.l+(i/(h.length-1))*iw, y=v=>pad.t+(max-v)/range*ih;
+  const ma=(n)=>h.map((_,i)=>i<n-1?null:ssAvg(h.slice(i-n+1,i+1).map(z=>z.close)));
+  const m20=ma(20),m50=ma(50);
+  const path=(arr)=>arr.map((v,i)=>v==null?'':(i?'L':'M')+x(i).toFixed(1)+','+y(v).toFixed(1)).join(' ');
+  const candle=h.map((c,i)=>{const xx=x(i), w=Math.max(2,iw/h.length*.62), up=c.close>=c.open; return `<line x1="${xx}" y1="${y(c.high)}" x2="${xx}" y2="${y(c.low)}" stroke="${up?'#22c55e':'#ef4444'}" stroke-width="1"/><rect x="${xx-w/2}" y="${Math.min(y(c.open),y(c.close))}" width="${w}" height="${Math.max(1,y(c.open)-y(c.close))}" fill="${up?'#22c55e':'#ef4444'}" opacity=".85"/>`;}).join('');
+  const grid=[0.25,0.5,0.75].map(p=>`<line x1="${pad.l}" x2="${W-pad.r}" y1="${pad.t+ih*p}" y2="${pad.t+ih*p}" stroke="#1e293b"/>`).join('');
+  const sr=(v,label,stroke)=>`<line x1="${pad.l}" x2="${W-pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="${stroke}" stroke-dasharray="6 4"/><text x="${W-pad.r+3}" y="${y(v)-3}" fill="${stroke}" font-size="9">${label}</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><rect width="100%" height="100%" fill="#020617"/>${grid}${candle}<path d="${path(m20)}" fill="none" stroke="#38bdf8" stroke-width="2"/><path d="${path(m50)}" fill="none" stroke="#a78bfa" stroke-width="2"/>${sr(a.support,'S','#22c55e')}${sr(a.resistance,'R','#f59e0b')}<text x="48" y="18" fill="#38bdf8" font-size="9">MA20</text><text x="85" y="18" fill="#a78bfa" font-size="9">MA50</text></svg>`;
+}
+function ssRenderCard(a){
+  const cls={'WATCH':'ss-watch','PULLBACK':'ss-pull','BREAKOUT':'ss-break','OPEN':'ss-open','TAKE PROFIT':'ss-tp','EXIT':'ss-exit','MONITOR':'ss-monitor'}[a.stage]||'ss-monitor';
+  const pctScore=Math.round(a.score/a.total*100);
+  const cond=a.cond.map(c=>`<div class="ss-cond ${c[1]?'ok':''}">${c[1]?'✓':'○'} ${ssEsc(c[0])}</div>`).join('');
+  return `<div class="ss-card"><div class="ss-head"><div><div class="ss-ticker">${ssEsc(a.t)} <span class="ss-meta">${ssEsc(getSector(a.t))}</span></div><div class="ss-meta">${ssNum(a.price,0)} · ${ssPct(a.change)} · ATR ${ssNum(a.atr,0)}</div></div><span class="ss-stage ${cls}">${a.stage}</span></div><div class="ss-chart">${ssChartSVG(a)}</div><div class="ss-stats"><div class="ss-stat"><span>Support</span><b>${ssNum(a.support,0)}</b></div><div class="ss-stat"><span>Resistance</span><b>${ssNum(a.resistance,0)}</b></div><div class="ss-stat"><span>MA20</span><b>${ssNum(a.ma20,0)}</b></div><div class="ss-stat"><span>MA50</span><b>${ssNum(a.ma50,0)}</b></div></div><div class="ss-score"><b>Strength ${a.score}/${a.total}</b><div class="ss-scorebar"><i style="width:${pctScore}%"></i></div><div class="ss-meta">${ssEsc(a.reason||'Belum ada kondisi kuat')}</div></div><div class="ss-conds">${cond}</div><div class="ss-footer"><span>RSI ${ssNum(a.rsi,1)} · Vol ${ssNum(a.volX,2)}× Avg20</span><span>${a.sweep?'Sweep ✓ ':''}${a.rejection?'Rejection ✓ ':''}${a.tp1?'TP zone':''}</span></div></div>`;
+}
+function renderSmartScanner(){
+  const list=getTickers().map(ssAnalyze).filter(Boolean); const f=document.getElementById('ssStageFilter')?.value||'ALL'; const sort=document.getElementById('ssSort')?.value||'score';
+  const filtered=list.filter(a=>f==='ALL'||a.stage===f);
+  filtered.sort((a,b)=>sort==='stage'?(b.priority-a.priority||b.score-a.score):sort==='change'?(b.change-a.change):sort==='ticker'?a.t.localeCompare(b.t):(b.score-a.score||b.priority-a.priority||b.change-a.change));
+  const rank=document.getElementById('ssRankBody'); if(rank) rank.innerHTML=filtered.map((a,i)=>`<tr class="ss-row" onclick="document.getElementById('ss-card-${a.t}').scrollIntoView({behavior:'smooth',block:'center'})"><td class="ss-rank">${i+1}</td><td><b>${a.t}</b><div class="ss-meta">${getSector(a.t)}</div></td><td><span class="ss-stage ${({'WATCH':'ss-watch','PULLBACK':'ss-pull','BREAKOUT':'ss-break','OPEN':'ss-open','TAKE PROFIT':'ss-tp','EXIT':'ss-exit','MONITOR':'ss-monitor'})[a.stage]||'ss-monitor'}">${a.stage}</span></td><td><b>${a.score}/${a.total}</b></td><td>${ssNum(a.price,0)}<div class="ss-meta">${ssPct(a.change)}</div></td><td>${ssNum(a.support,0)}</td><td>${ssNum(a.resistance,0)}</td><td>${ssNum(a.ma20,0)}</td><td>${ssNum(a.ma50,0)}</td><td>${ssNum(a.rsi,1)}</td><td>${ssNum(a.volX,2)}×</td><td class="ss-reason">${ssEsc(a.reason)}</td></tr>`).join('') || '<tr><td colspan="12">Belum ada data. Klik Scan & Sync.</td></tr>';
+  const cards=document.getElementById('ssCards'); if(cards) cards.innerHTML=filtered.map(a=>`<div id="ss-card-${a.t}">${ssRenderCard(a)}</div>`).join('') || '<div class="card">Tidak ada saham sesuai filter.</div>';
+}
+
+</script>
+</body>
+</html>
